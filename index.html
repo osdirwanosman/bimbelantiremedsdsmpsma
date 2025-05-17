@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kuis Interaktif</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://script.google.com/macros/s/AKfycbw4d7RSt9fQbNK6FGFSda5_keMIpWkTQn4pUW015gioiQfcFetze_3P5NqrbxlbG8ry/exec"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+
+  <!-- Halaman Identitas -->
+  <div class="identity-page">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap;">
+      
+      <!-- Judul & Alamat tetap di tengah -->
+      <div style="flex: 1; text-align: left;">
+        <h1 class="bimbel-title" style="margin-bottom: 5px;">BIMBEL ANTIREMED SD SMP SMA</h1>
+        <p class="bimbel-address" style="margin-top: 0;">
+          Jln. Latumeten III Barat RT.001 RW.011 No. 34 Jelambar<br />
+          Handphone: 085216772626
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="main-container">
+    <!-- Form Identitas -->
+<div id="identity-form">
+<div class="info-message" id="motivasi-peserta">
+  🎯 <strong>PESAN</strong><br><span id="pesan-motivasi">Mengambil pesan...</span>
+</div>
+  <h2>Identitas Peserta</h2>
+      <input type="email" id="email" placeholder="Isi Email"><br>
+      <input type="text" id="name" placeholder="Nama"><br>
+      <input type="text" id="sekolah" placeholder="Asal Sekolah"><br>
+      <select id="kurikulum"><option value="">Memuat kurikulum...</option></select>
+      <select id="kelas"><option value="">Pilih Kelas...</option></select><br>   
+      <select id="mapel"><option value="">Pilih Mata Pelajaran</option></select><br>
+      <select id="bab"><option value="">Memuat daftar bab...</option></select><br>
+      <input type="number" id="jumlahSoal" placeholder="Jumlah Soal" min="1" readonly><br>
+      <input type="number" id="durasi" placeholder="Durasi (menit)" min="1" readonly><br>
+      <select id="paket"><option value="">Pilih Paket</option></select><br>
+      <input type="password" id="password" placeholder="Password"><br>
+      <span id="password-message" style="color: red; font-weight: bold;"></span><br>
+      <button id="start-btn" disabled>Mulai</button>
+      <button id="exit-btn" class="main-button">Selesai</button>
+</div>
+    </div>
+
+    <!-- Halaman Kuis -->
+   <div id="quiz-box" style="display:none;">
+  <div class="top-bar">
+    <!-- Status Box (Timer dan Skor) - Di atas -->
+    <div class="status-box">
+      <div id="timer">00:00</div>
+      <div id="score">Skor: 0</div>
+    </div>
+    
+  </div>
+
+  <div class="top-bar">
+    <!-- Kotak Info Peserta - Di bawah status -->
+    <div id="participant-info" class="info-box">
+      <div><strong>Nama</strong><br><span id="label-nama-siswa"></span></div>
+      <div><strong>Sekolah</strong><br><span id="label-asal-sekolah"></span></div>
+      <div><strong>Kelas</strong><br><span id="label-kelas"></span></div>
+      <div><strong>Bab</strong><br><span id="label-bab-materi"></span></div>
+      <div><strong>Paket </strong><span id="label-nama-paket"></span></div>
+    </div>
+  </div>
+  
+
+  <div class="quiz-content">
+    <div id="question"></div>
+    <div id="options"></div>
+    <div id="feedback"></div>
+  </div>
+  <div id="navigation"></div>
+</div>
+
+  </div>
+
+  <!-- Script: Muat dropdown paket berdasarkan bab -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.getElementById("bab").addEventListener("change", function () {
+        const babDipilih = this.value;
+        updatePaketDropdown(babDipilih);
+      });
+    });
+
+    function updatePaketDropdown(bab) {
+      const url = 'https://opensheet.elk.sh/1-XMEFrfkLfxd9AWi-EfLuGo8dnjO_kzYUCJ2gy9C-zs/Sheet1';
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          const paketSelect = document.getElementById("paket");
+          paketSelect.innerHTML = '<option value="">Pilih Paket</option>';
+          const filtered = data.filter(row => row["Nama Sheet"] === bab);
+          if (filtered.length > 0) {
+            const paketList = filtered[0]["Paket Ke"].split(',').map(s => s.trim());
+            for (const paket of paketList) {
+              const option = document.createElement("option");
+              option.value = paket;
+              option.textContent = paket;
+              paketSelect.appendChild(option);
+            }
+          } else {
+            const option = document.createElement("option");
+            option.textContent = "Tidak ada paket tersedia";
+            paketSelect.appendChild(option);
+          }
+        })
+        .catch(err => {
+          console.error("Gagal memuat paket:", err);
+        });
+    }
+  </script>
+  
+      
+</html>
+<!-- Elemen form dan lainnya -->
+<input type="email" id="email" placeholder="Isi Email" />
+
+
+
+<!-- Tempatkan script di sini -->
+<script>
+  async function ambilPesanMotivasi(email) {
+    const url = `https://script.google.com/macros/s/AKfycbwwRlCvAHQSsNG1tvqiE2SdJ0tKiJ-Z27hKQyALBEXvR65FLEytzE90C4qTM2RpwAFq5A/exec?email=${encodeURIComponent(email)}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.pesan) {
+        document.getElementById('pesan-motivasi').innerText = data.pesan;
+      } else {
+        document.getElementById('pesan-motivasi').innerText = "Semangat ya!";
+      }
+    } catch (error) {
+      console.error("Gagal mengambil pesan motivasi:", error);
+      document.getElementById('pesan-motivasi').innerText = "Tetap semangat!";
+    }
+  }
+
+  document.getElementById('email').addEventListener('blur', function() {
+    const email = this.value.trim();
+    if (email) ambilPesanMotivasi(email);
+  });
+</script>
+<script src="script.js"></script>
+</body>
+</html>
